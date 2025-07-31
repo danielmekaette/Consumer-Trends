@@ -1,5 +1,5 @@
 This tool uses pytrends, an unofficial Google Trends API, to gather data on how often people are searching particular phrases.
-The idea is that this would form part of a dashboard that would let someone make an informed decision on what items they should try and resell.
+The idea is that this would form part of a dashboard that would let someone make an informed decision on what items they should try to resell.
 
 Currently (31/07) this app has the ability to:
 

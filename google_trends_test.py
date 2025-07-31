@@ -22,8 +22,8 @@ client = gspread.authorize(creds)
 spreadsheet = client.open("Consumer trends")
 worksheet = spreadsheet.worksheet("Phrases")
 
-# Caching to avoid repeated calls
-@st.cache_data
+# Thinking about caching to avoid repeated calls, not working properly yet
+# @st.cache_data
 def load_phrases():
     return worksheet.col_values(1)
 
@@ -316,7 +316,9 @@ if custom_terms:
 # Choice to delete phrases
 st.subheader("Delete Unwanted Phrases")
 
-# Reload the latest list from the sheet
+def load_phrases():
+    return worksheet.col_values(1)
+
 current_phrases = load_phrases()
 
 phrase_to_delete = st.multiselect(
@@ -328,18 +330,18 @@ if st.button("Delete Selected Phrases"):
     if not phrase_to_delete:
         st.warning("Please select at least one phrase to delete.")
     else:
-        # Get all rows in the sheet
         all_values = worksheet.get_all_values()
 
         for phrase in phrase_to_delete:
-            # Find the row number (1-based index) and delete
             for idx, row in enumerate(all_values, start=1):
                 if row and row[0].strip().lower() == phrase.strip().lower():
                     worksheet.delete_rows(idx)
                     break  # Only delete the first match
-        
-        st.cache_data.clear() 
+
         st.success("Selected phrases have been deleted.")
+
+        # Reload the list immediately after deletion
+        current_phrases = load_phrases()
 
 
 

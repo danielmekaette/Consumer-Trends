@@ -86,14 +86,14 @@ if st.button("Analyse Phrases"):
         batch = all_phrases[i:i+batch_size]
         if not safe_build_payload(pytrends, batch):
             continue
-
+        
         try:
             pytrends.build_payload(batch, cat=0, timeframe='today 1-m', geo='GB', gprop='')
             data = pytrends.interest_over_time()
-
+            # dropping incomplete current data
             if 'isPartial' in data.columns:
                 data = data.drop(columns=['isPartial'])
-
+            
             for term in batch:
                 if term not in data.columns or len(data[term]) < 21:
                     summary_rows.append({
@@ -105,14 +105,14 @@ if st.button("Analyse Phrases"):
                         "Avg Interest": "N/A"
                     })
                     continue
-
+                #parameters for time period comparisons
                 recent_3 = data[term].iloc[-3:]
                 prev_11 = data[term].iloc[-14:-3]
                 last_4 = data[term].iloc[-4:]
 
                 recent_avg = recent_3.mean()
                 prev_avg = prev_11.mean()
-
+                #deals with phrases that were previously essentially never searched 
                 if prev_avg == 0:
                     if recent_avg > 10:
                         status = "New Spike"
@@ -122,11 +122,12 @@ if st.button("Analyse Phrases"):
                         status = "-"
                         pct_change = "N/A"
                         notes = "Insufficient signal"
+                #parameters to detect recent spikes/drops and if these trends have carried on to the present
                 else:
                     pct_change_val = ((recent_avg - prev_avg) / prev_avg) * 100
                     sustained_rise = (last_4 > prev_avg).sum() >= 3
                     sustained_drop = (last_4 < prev_avg).sum() >= 3
-
+                #
                     if pct_change_val >= 10:
                         status = "Spike"
                         notes = "Sustained increase" if sustained_rise else "Unsustained increase"
@@ -139,7 +140,7 @@ if st.button("Analyse Phrases"):
 
                     pct_change = f"{pct_change_val:.1f}%"
 
-                # NEW: Calculate interest level based on full 30-day average
+                # Calculate interest level based on full 30-day average
                 avg_interest = data[term].mean()
                 if avg_interest < 25:
                     interest_level = "Low"
@@ -230,7 +231,7 @@ if st.button("Analyse Phrases"):
         st.info("No phrases with spikes or drops to display in chart.")
 
 
-    # Additional chart: All high-interest phrases (avg interest >= 50)
+    # Charting high-interest phrases (avg interest >= 50)
     st.subheader("Phrases with High or Extremely High Interest")
     st.write("Phrases with the highest average level of interest (up to 5).")
 
@@ -269,7 +270,6 @@ if st.button("Analyse Phrases"):
 st.subheader("Visualise Custom Phrase Trends")
 st.write("Select up to 5 phrases to view their trends over the past month.")
 
-# Always load the latest phrases directly from the sheet
 custom_phrase_list = load_phrases()
 
 custom_terms = st.multiselect(

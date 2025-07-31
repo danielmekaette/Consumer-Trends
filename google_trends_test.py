@@ -50,6 +50,7 @@ if st.button("Submit Phrase"):
         st.info("That phrase already exists in the sheet.")
     else:
         worksheet.append_row([new_phrase.strip()])
+        st.cache_data.clear()
         st.success(f"Added phrase: {new_phrase.strip()}")
 
 
@@ -266,7 +267,7 @@ if st.button("Analyse Phrases"):
 
 # Custom Phrase Trend Chart
 st.subheader("Visualise Custom Phrase Trends")
-st.write("Select up to 5 phrases to view their trend over the past month.")
+st.write("Select up to 5 phrases to view their trends over the past month.")
 
 custom_terms = st.multiselect(
     "Choose up to 5 phrases:",
@@ -336,7 +337,8 @@ if st.button("Delete Selected Phrases"):
                 if row and row[0].strip().lower() == phrase.strip().lower():
                     worksheet.delete_rows(idx)
                     break  # Only delete the first match
-
+        
+        st.cache_data.clear() 
         st.success("Selected phrases have been deleted.")
 
 

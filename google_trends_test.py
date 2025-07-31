@@ -269,16 +269,17 @@ if st.button("Analyse Phrases"):
 st.subheader("Visualise Custom Phrase Trends")
 st.write("Select up to 5 phrases to view their trends over the past month.")
 
+# Always load the latest phrases directly from the sheet
+custom_phrase_list = load_phrases()
+
 custom_terms = st.multiselect(
     "Choose up to 5 phrases:",
-    options=existing_phrases,
+    options=custom_phrase_list,
     max_selections=5
 )
 
 if custom_terms:
-    # Try to use the cached data if it's been recently fetched
     try:
-        # Only reuse summary_df if it exists and was just generated
         if "summary_df" in st.session_state and "pytrends" in st.session_state:
             summary_df = st.session_state["summary_df"]
             pytrends = st.session_state["pytrends"]
@@ -286,7 +287,6 @@ if custom_terms:
             st.warning("Please run 'Analyse Phrases' first.")
             st.stop()
 
-        # Safe to continue
         if safe_build_payload(pytrends, custom_terms):
             try:
                 pytrends.build_payload(custom_terms, cat=0, timeframe='today 1-m', geo='GB', gprop='')

@@ -7,14 +7,17 @@ import time
 import random 
 from datetime import datetime, date
 import matplotlib.pyplot as plt
+import json
 
 # Google Sheets Setup 
 scope = [
     "https://spreadsheets.google.com/feeds",
     "https://www.googleapis.com/auth/drive"
 ]
-creds = ServiceAccountCredentials.from_json_keyfile_name(
-    "service_account.json", scope
+
+key_dict = st.secrets["gcp_service_account"]
+creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
+
 )
 client = gspread.authorize(creds)
 spreadsheet = client.open("Consumer trends")

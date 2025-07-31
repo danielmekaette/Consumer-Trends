@@ -18,7 +18,6 @@ scope = [
 key_dict = st.secrets["gcp_service_account"]
 creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
 
-)
 client = gspread.authorize(creds)
 spreadsheet = client.open("Consumer trends")
 worksheet = spreadsheet.worksheet("Phrases")
